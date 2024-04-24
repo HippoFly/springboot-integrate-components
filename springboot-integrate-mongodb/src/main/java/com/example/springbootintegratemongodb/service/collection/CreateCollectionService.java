@@ -26,7 +26,7 @@ public class CreateCollectionService {
      */
     public Object createCollection() {
         // 设置集合名称
-        String collectionName = "users1";
+        String collectionName = "users";
         // 创建集合并返回集合信息
         mongoTemplate.createCollection(collectionName);
         // 检测新的集合是否存在，返回创建结果

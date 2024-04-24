@@ -19,9 +19,10 @@ public class QueryController {
 
     @ApiOperation(value = "根据【文档ID】查询集合中文档数据",
             notes = "根据【文档ID】查询集合中文档数据。")
-    @GetMapping("/query/id")
-    public Object getDocById() {
-        return queryService.findById();
+    @GetMapping("/query")
+    public Object getDocById(@RequestParam("id") String id) {
+        if(id==null){ id = "1";}
+        return queryService.findById(id);
     }
 
     @ApiOperation(value = "根据【条件】查询集合中【符合条件】的文档，只取【第一条】数据",
