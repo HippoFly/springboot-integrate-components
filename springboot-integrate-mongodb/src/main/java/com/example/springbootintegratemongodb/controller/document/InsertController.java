@@ -1,5 +1,6 @@
 package com.example.springbootintegratemongodb.controller.document;
 
+import com.example.springbootintegratemongodb.entity.User;
 import com.example.springbootintegratemongodb.service.document.InsertService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,8 +23,8 @@ public class InsertController {
     @ApiOperation(value = "插入【一条】文档数据，如果文档信息已经【存在就抛出异常】",
             notes = "插入【一条】文档数据，如果文档信息已经【存在就抛出异常】。")
     @PostMapping("/insert/one")
-    public Object insertData() {
-        return insertService.insert();
+    public Object insertData(User user, String collectionName) {
+        return insertService.insert(user,collectionName);
     }
 
     @ApiOperation(value = "插入【多条】文档数据，如果文档信息已经【存在就抛出异常】",

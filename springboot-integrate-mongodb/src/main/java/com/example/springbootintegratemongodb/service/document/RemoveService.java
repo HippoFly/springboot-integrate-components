@@ -40,7 +40,7 @@ public class RemoveService {
         Criteria criteria = Criteria.where("age").is(age).and("sex").is(sex);
         // 创建查询对象，然后将条件对象添加到其中
         Query query = new Query(criteria);
-        // 执行删除查找到的匹配的全部文档信息
+        // 执行删除查找到的匹配的全部文档信息,该方法不会返回任何被删除的文档信息，只执行删除操作。
         DeleteResult result = mongoTemplate.remove(query, COLLECTION_NAME);
         // 输出结果信息
         String resultInfo = "成功删除 " + result.getDeletedCount() + " 条文档信息";
@@ -60,7 +60,9 @@ public class RemoveService {
         Criteria criteria = Criteria.where("name").is(name);
         // 创建查询对象，然后将条件对象添加到其中
         Query query = new Query(criteria);
-        // 执行删除查找到的匹配的第一条文档,并返回删除的文档信息
+        // 根据提供的查询条件(query)查找集合(COLLECTION_NAME)中的一个文档。
+        // 查找到后，它会立即删除这个文档。
+        // 会返回被删除的文档。这意味着你有机会在删除后获取并使用该文档的数据。这对于需要在删除前后处理或记录被删文档信息的场景非常有用。
         User result = mongoTemplate.findAndRemove(query, User.class, COLLECTION_NAME);
         // 输出结果信息
         String resultInfo = "成功删除文档信息，文档内容为：" + result;

@@ -7,6 +7,7 @@ import com.example.springbootintegratemongodb.entity.Status;
 import com.example.springbootintegratemongodb.entity.User;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +23,9 @@ import java.util.List;
 @Service
 public class InsertService {
 
-    /** 设置集合名称 */
+    /**
+     * 设置集合名称
+     */
     private static final String COLLECTION_NAME = "users";
 
     @Resource
@@ -33,9 +36,9 @@ public class InsertService {
      *
      * @return 插入的文档信息
      */
-    public Object insert() {
+    public Object insert(User user, String collectionName) {
         // 设置用户信息
-        User user = new User()
+        User user1 = new User()
                 .setId("10")
                 .setAge(22)
                 .setSex("男")
@@ -45,7 +48,7 @@ public class InsertService {
                 .setBirthday(new Date())
                 .setStatus(new Status().setHeight(180).setWeight(150));
         // 插入一条用户数据，如果文档信息已经存在就抛出异常
-        User newUser = mongoTemplate.insert(user, COLLECTION_NAME);
+        User newUser = mongoTemplate.insert(user == null ? user1 : user, collectionName == null ? "users" : collectionName);
         // 输出存储结果
         log.info("存储的用户信息为：{}", newUser);
         return newUser;
@@ -55,9 +58,8 @@ public class InsertService {
      * 插入【多条】文档数据，如果文档信息已经【存在就抛出异常】
      *
      * @return 插入的多个文档信息
-     *
      */
-    public Object insertMany(){
+    public Object insertMany() {
         // 设置两个用户信息
         User user1 = new User()
                 .setId("11")
