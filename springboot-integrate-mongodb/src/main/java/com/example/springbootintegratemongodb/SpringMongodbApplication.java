@@ -6,10 +6,10 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @EnableSwagger2
 @SpringBootApplication
-public class SpringbootIntegrateMongodbApplication {
+public class SpringMongodbApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringbootIntegrateMongodbApplication.class, args);
+        SpringApplication.run(SpringMongodbApplication.class, args);
     }
 
 }
