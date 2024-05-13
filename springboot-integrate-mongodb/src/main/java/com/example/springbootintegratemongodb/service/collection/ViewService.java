@@ -24,15 +24,16 @@ public class ViewService {
      *
      * @return 创建视图结果
      */
-    public Object createView() {
+    public Object createView( String newViewName,  String collectionName,String pattern) {
         // 设置视图名
-        String newViewName = "usersView";
+//        String newViewName = "usersView";
         // 设置获取数据的集合名称
-        String collectionName = "users";
+//        String collectionName = "users";
+//        String pattern = "{\"$match\":{\"sex\":\"女\"}}";
         // 定义视图的管道,可是设置视图显示的内容多个筛选条件
         List<Bson> pipeline = new ArrayList<>();
         // 设置条件，用于筛选集合中的文档数据，只有符合条件的才会映射到视图中
-        pipeline.add(Document.parse("{\"$match\":{\"sex\":\"女\"}}"));
+        pipeline.add(Document.parse(pattern));
         // 执行创建视图
         mongoTemplate.getDb().createView(newViewName, collectionName, pipeline);
         // 检测新的集合是否存在，返回创建结果

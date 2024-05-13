@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.validation.Validator;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.Resource;
 
 /**
@@ -24,11 +25,10 @@ public class CreateCollectionService {
      *
      * @return 创建集合的结果
      */
-    public Object createCollection() {
-        // 设置集合名称
-        String collectionName = "users";
+    public Object createCollection(String collectionName) {
         // 创建集合并返回集合信息
         mongoTemplate.createCollection(collectionName);
+//        mongoTemplate.createCollection(collectionName, CollectionOptions.empty().capped().maxDocuments(100));
         // 检测新的集合是否存在，返回创建结果
         return mongoTemplate.collectionExists(collectionName) ? "创建视图成功" : "创建视图失败";
     }

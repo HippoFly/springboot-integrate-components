@@ -20,9 +20,7 @@ public class RemoveCollectionService {
      *
      * @return 创建集合结果
      */
-    public Object dropCollection() {
-        // 设置集合名称
-        String collectionName = "users3";
+    public Object dropCollection( String collectionName) {
         // 执行删除集合
         mongoTemplate.getCollection(collectionName).drop();
         // 检测新的集合是否存在，返回删除结果

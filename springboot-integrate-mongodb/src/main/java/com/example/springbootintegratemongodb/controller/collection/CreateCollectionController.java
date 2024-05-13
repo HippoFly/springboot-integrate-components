@@ -21,8 +21,8 @@ public class CreateCollectionController {
 
     @ApiOperation(value = "创建【集合】", notes = "创建【集合结果】。")
     @PostMapping("/create")
-    public Object createCollection() {
-        return createCollectionService.createCollection();
+    public Object createCollection(String collectionName) {
+        return createCollectionService.createCollection(collectionName);
     }
 
     @ApiOperation(value = "创建【固定大小】的【集合】", notes = "创建【固定大小】的【集合结果】。")

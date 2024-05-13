@@ -26,8 +26,8 @@ public class QueryCollectionController {
 
     @ApiOperation(value = "获取【集合名称列表】", notes = "获取【集合名称列表】。")
     @GetMapping("/exists")
-    public Object getCollectionExists() {
-        return queryCollectionService.collectionExists();
+    public Object getCollectionExists(String collectionName) {
+        return queryCollectionService.collectionExists(collectionName);
     }
 
 }

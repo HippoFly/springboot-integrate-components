@@ -20,8 +20,8 @@ public class RemoveCollectionController {
 
     @ApiOperation(value = "删除【集合】", notes = "删除【集合结果】。")
     @DeleteMapping("/drop")
-    public Object dropCollection() {
-        return removeCollectionService.dropCollection();
+    public Object dropCollection( String collectionName) {
+        return removeCollectionService.dropCollection(collectionName);
     }
 
 }

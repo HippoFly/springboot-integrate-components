@@ -30,9 +30,8 @@ public class QueryCollectionService {
      *
      * @return 集合是否存在
      */
-    public boolean collectionExists() {
+    public boolean collectionExists(String collectionName) {
         // 设置集合名称
-        String collectionName = "users";
         // 检测新的集合是否存在，返回检测结果
         return mongoTemplate.collectionExists(collectionName);
     }
