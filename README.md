@@ -15,4 +15,4 @@ MAVEN 3.6.3
 
 - MongoDB [MongoDB安装](https://www.runoob.com/mongodb/mongodb-window-install.html)
 
-目的是测试`mongodb`整合
+目的是测试`mongodb`整合后，有关的一些操作测试
