@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mybatis.mapper.UserMapperXml" >
+
+    <resultMap id="BaseResultMap" type="com.example.mybatis.entity.UserEntity" >
+        <id column="id" property="id" jdbcType="BIGINT" />
+        <result column="email" property="email" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="sex" property="sex" jdbcType="VARCHAR" />
+        <result column="tel" property="tel" jdbcType="VARCHAR" />
+        <result column="address" property="address" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT * FROM user
+    </select>
+
+    <select id="getInfoById" resultMap="BaseResultMap">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.example.mybatis.entity.UserEntity">
+        INSERT INTO user(id,email,name,sex,tel,address)
+        VALUES(#{id},#{email},#{name},#{sex},#{tel},#{address})
+    </insert>
+
+    <update id="update" parameterType="com.example.mybatis.entity.UserEntity">
+        UPDATE user SET name=#{name},address=#{address} WHERE id =#{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM user WHERE id =#{id}
+    </delete>
+
+</mapper>

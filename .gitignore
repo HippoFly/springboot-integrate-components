@@ -37,3 +37,5 @@ hs_err_pid*
 
 #mac
 .DS_Store
+/springboot-example-mybatis/target/classes/
+/**/target/**
