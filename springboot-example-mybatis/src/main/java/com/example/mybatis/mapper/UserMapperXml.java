@@ -40,6 +40,12 @@ public interface UserMapperXml {
      */
     void delete(Long id);
 
+    /**
+     * 一对一查询
+     * 一个位置和一个User对应
+     * @param pid
+     * @return
+     */
     PositionEntity getPosition(Long pid);
 
 }
