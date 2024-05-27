@@ -1,5 +1,6 @@
 package com.example.mybatis.mapper;
 
+import com.example.mybatis.entity.PositionEntity;
 import com.example.mybatis.entity.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -38,5 +39,7 @@ public interface UserMapperXml {
      * @param id
      */
     void delete(Long id);
+
+    PositionEntity getPosition(Long pid);
 
 }

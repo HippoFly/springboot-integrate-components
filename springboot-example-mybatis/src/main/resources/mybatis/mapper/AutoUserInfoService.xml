@@ -10,6 +10,12 @@
         <result column="tel" property="tel" jdbcType="VARCHAR" />
         <result column="address" property="address" jdbcType="VARCHAR" />
     </resultMap>
+    <resultMap id="positionResultMap" type="com.example.mybatis.entity.PositionEntity">
+        <id property="id" column="pid" />
+        <result property="name" column="pname"/>
+        <!--一对一结果映射,这里是sql就查出了所有参数，然后这里映射回去嵌套对象-->
+        <association property="user" javaType="com.example.mybatis.entity.UserEntity" resultMap="BaseResultMap"/>
+    </resultMap>
 
     <select id="findAll" resultMap="BaseResultMap">
         SELECT * FROM user
@@ -17,6 +23,11 @@
 
     <select id="getInfoById" resultMap="BaseResultMap">
         SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <select id="getPosition" resultType="com.example.mybatis.entity.PositionEntity" parameterType="java.lang.Long" resultMap="positionResultMap">
+        SELECT * FROM position p
+        left join user u on p.uid=u.id
     </select>
 
     <insert id="insert" parameterType="com.example.mybatis.entity.UserEntity">

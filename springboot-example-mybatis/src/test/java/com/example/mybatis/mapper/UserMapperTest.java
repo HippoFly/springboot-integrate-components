@@ -1,5 +1,6 @@
 package com.example.mybatis.mapper;
 
+import com.example.mybatis.entity.PositionEntity;
 import com.example.mybatis.entity.UserEntity;
 import com.example.mybatis.mapper.UserMapperXml;
 import org.junit.Test;
@@ -22,5 +23,11 @@ public class UserMapperTest {
 
         List<UserEntity> all = userMapperXml.findAll();
         all.forEach(System.out::println);
+    }
+
+    @Test
+    public void testGetOne2One() {
+        PositionEntity position = userMapperXml.getPosition(1L);
+        System.out.println(position);
     }
 }
