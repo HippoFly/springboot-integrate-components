@@ -1,5 +1,6 @@
 package com.example.mybatis.mapper;
 
+import com.example.mybatis.entity.DeptEntity;
 import com.example.mybatis.entity.PositionEntity;
 import com.example.mybatis.entity.UserEntity;
 import com.example.mybatis.mapper.UserMapperXml;
@@ -29,5 +30,10 @@ public class UserMapperTest {
     public void testGetOne2One() {
         PositionEntity position = userMapperXml.getPosition(1L);
         System.out.println(position);
+    }
+    @Test
+    public void testGetOne2Many() {
+        DeptEntity dept = userMapperXml.getDept(1L);
+        System.out.println(dept);
     }
 }

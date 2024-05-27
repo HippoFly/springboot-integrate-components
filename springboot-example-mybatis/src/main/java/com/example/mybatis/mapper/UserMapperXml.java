@@ -1,5 +1,6 @@
 package com.example.mybatis.mapper;
 
+import com.example.mybatis.entity.DeptEntity;
 import com.example.mybatis.entity.PositionEntity;
 import com.example.mybatis.entity.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -47,5 +48,13 @@ public interface UserMapperXml {
      * @return
      */
     PositionEntity getPosition(Long pid);
+
+    /**
+     * 一对多
+     * 一个部门，多个User
+     * @param id
+     * @return
+     */
+    DeptEntity getDept(Long id);
 
 }

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.mybatis.mapper.UserMapperXml" >
 
-    <resultMap id="BaseResultMap" type="com.example.mybatis.entity.UserEntity" >
+    <resultMap id="UserResultMap" type="com.example.mybatis.entity.UserEntity" >
         <id column="id" property="id" jdbcType="BIGINT" />
         <result column="email" property="email" jdbcType="VARCHAR" />
         <result column="name" property="name" jdbcType="VARCHAR" />
@@ -14,20 +14,43 @@
         <id property="id" column="pid" />
         <result property="name" column="pname"/>
         <!--一对一结果映射,这里是sql就查出了所有参数，然后这里映射回去嵌套对象-->
-        <association property="user" javaType="com.example.mybatis.entity.UserEntity" resultMap="BaseResultMap"/>
+        <association property="user" javaType="com.example.mybatis.entity.UserEntity" resultMap="UserResultMap"/>
+    </resultMap>
+    <resultMap id="DeptResultMap" type="com.example.mybatis.entity.DeptEntity">
+        <id property="id" column="dept_pid" />
+        <result property="name" column="dept_name"/>
+        <result property="code" column="dept_code"/>
+        <collection property="userList" ofType="com.example.mybatis.entity.UserEntity">
+            <id column="user_id" property="id" jdbcType="BIGINT" />
+            <result column="user_email" property="email" jdbcType="VARCHAR" />
+            <result column="user_name" property="name" jdbcType="VARCHAR" />
+            <result column="user_sex" property="sex" jdbcType="VARCHAR" />
+            <result column="user_tel" property="tel" jdbcType="VARCHAR" />
+            <result column="user_address" property="address" jdbcType="VARCHAR" />
+        </collection>
     </resultMap>
 
-    <select id="findAll" resultMap="BaseResultMap">
+    <select id="findAll" resultMap="UserResultMap">
         SELECT * FROM user
     </select>
 
-    <select id="getInfoById" resultMap="BaseResultMap">
+    <select id="getInfoById" resultMap="UserResultMap">
         SELECT * FROM user WHERE id = #{id}
     </select>
 
     <select id="getPosition" resultType="com.example.mybatis.entity.PositionEntity" parameterType="java.lang.Long" resultMap="positionResultMap">
         SELECT * FROM position p
         left join user u on p.uid=u.id
+        where p.pid=#{pid}
+    </select>
+
+    <select id="getDept" resultMap="DeptResultMap" parameterType="java.lang.Long">
+        select d.dept_id as dept_pid, d.name as dept_name, d.code as dept_code,
+               u.id as user_id, u.email as user_email, u.name as user_name,
+               u.sex as user_sex, u.tel as user_tel, u.address as user_address
+        from dept d
+                 left join user u on u.dept_id=d.dept_id
+        where d.dept_id=#{id}
     </select>
 
     <insert id="insert" parameterType="com.example.mybatis.entity.UserEntity">
