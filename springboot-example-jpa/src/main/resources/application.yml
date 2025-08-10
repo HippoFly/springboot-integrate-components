@@ -1,0 +1,30 @@
+server:
+  port: 8280
+
+spring:
+  datasource:
+    # 使用MySQL数据库
+    url: jdbc:mysql://localhost:3306/testdb?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+  
+  jpa:
+    # 数据库方言
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    # 自动创建更新表结构
+    hibernate:
+      ddl-auto: update
+    # 显示SQL语句
+    show-sql: true
+    # 格式化SQL语句
+    properties:
+      hibernate:
+        format_sql: true
+  
+  # H2控制台配置移除
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
