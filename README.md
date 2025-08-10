@@ -9,15 +9,27 @@ Intellij Idea 2021
 JDK 1.8
 MAVEN 3.6.3
 
-## 目前整合组件Module
+# 整合组件Module
 
 ### Spring-base-functions
 
 这是测试Spring自身提供的一些基本功能|APIs
 
-### 
 
-springboot-integrate-mongodb
+
+### springboot-example-jpa
+
+单体应用的测试
+
+### springboot-example-mybatis
+
+整合 ORM 框架 Mybatis/Plus
+
+### springboot-integrate-caffeine
+
+测试caffeine
+
+###  springboot-integrate-mongodb
 
 - MongoDB [MongoDB安装](https://www.runoob.com/mongodb/mongodb-window-install.html)
 
