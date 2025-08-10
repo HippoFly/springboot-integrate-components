@@ -1,0 +1,23 @@
+# 测试环境配置
+server:
+  port: 8080
+
+spring:
+  kafka:
+    bootstrap-servers: new-kafka-server:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: test-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
+
+# Swagger配置
+swagger:
+  enabled: true
+  title: Spring Boot Kafka集成示例
+  description: Kafka集成示例接口文档
+  version: 1.0.0
+  base-package: com.example.springbootintegratekafka.controller
