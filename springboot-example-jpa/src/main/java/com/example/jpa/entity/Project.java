@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 用户实体类，演示JPA基本注解和CRUD操作
+ * 项目实体类，与User形成多对多关系
  */
 @Entity
-@Table(name = "user")
+@Table(name = "project")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Project {
     
     /**
      * 主键字段，自动生成
@@ -26,22 +26,28 @@ public class User {
     private Long id;
     
     /**
-     * 用户名，不能为空且唯一
+     * 项目名称，不能为空且唯一
      */
     @Column(nullable = false, unique = true)
-    private String username;
+    private String name;
     
     /**
-     * 用户邮箱
+     * 项目描述
      */
     @Column
-    private String email;
+    private String description;
     
     /**
-     * 用户年龄
+     * 项目开始时间
      */
-    @Column
-    private Integer age;
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
+    
+    /**
+     * 项目结束时间
+     */
+    @Column(name = "end_date")
+    private LocalDateTime endDate;
     
     /**
      * 创建时间
@@ -56,17 +62,15 @@ public class User {
     private LocalDateTime updateTime;
     
     /**
-     * 所属部门 - 多对一关系
+     * 参与项目的用户 - 多对多关系
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id")
-    private Department department;
-    
-    /**
-     * 参与的项目 - 多对多关系
-     */
-    @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
-    private List<Project> projects;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "user_project",
+        joinColumns = @JoinColumn(name = "project_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> users;
     
     @PreUpdate
     public void preUpdate() {
