@@ -9,19 +9,12 @@
     <packaging>pom</packaging>
     <version>1.0.0</version>
     <modules>
-        <module>springboot-example-elasticsearch</module>
-        <module>springboot-example-mybatis</module>
+        <module>springboot-base-functions</module>
         <module>springboot-example-jpa</module>
-        <module>springboot-example-lucene</module>
-        <module>springboot-example-mail</module>
-        <module>springboot-example-demo</module>
-        <module>springboot-example-upload</module>
-        <module>springboot-example-rabbitmq</module>
-        <module>springboot-example-redis</module>
-        <module>springboot-example-rocketmq</module>
-        <module>springboot-example-schedule</module>
-        <module>springboot-example-smail</module>
-        <module>springboot-example-web</module>
+        <module>springboot-example-mybatis</module>
+        <module>springboot-integrate-caffeine</module>
+        <module>springboot-integrate-kafka</module>
+        <module>springboot-integrate-mongodb</module>
     </modules>
 
     <parent>
