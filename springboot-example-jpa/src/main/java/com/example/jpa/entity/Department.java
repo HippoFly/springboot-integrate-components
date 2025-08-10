@@ -6,16 +6,17 @@ import lombok.AllArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * 用户实体类，演示JPA基本注解和CRUD操作
+ * 部门实体类，与User形成一对多关系
  */
 @Entity
-@Table(name = "user")
+@Table(name = "department")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Department {
     
     /**
      * 主键字段，自动生成
@@ -25,22 +26,16 @@ public class User {
     private Long id;
     
     /**
-     * 用户名，不能为空且唯一
+     * 部门名称，不能为空且唯一
      */
     @Column(nullable = false, unique = true)
-    private String username;
+    private String name;
     
     /**
-     * 用户邮箱
+     * 部门描述
      */
     @Column
-    private String email;
-    
-    /**
-     * 用户年龄
-     */
-    @Column
-    private Integer age;
+    private String description;
     
     /**
      * 创建时间
@@ -55,11 +50,10 @@ public class User {
     private LocalDateTime updateTime;
     
     /**
-     * 所属部门 - 多对一关系
+     * 与User的一对多关系
      */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "department_id")
-    private Department department;
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<User> users;
     
     @PreUpdate
     public void preUpdate() {
