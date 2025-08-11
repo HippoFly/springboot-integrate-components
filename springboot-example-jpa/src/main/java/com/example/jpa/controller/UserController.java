@@ -1,6 +1,8 @@
 package com.example.jpa.controller;
 
-import com.alibaba.fastjson.JSON;
+import com.example.jpa.dto.Mapper;
+import com.example.jpa.dto.ProjectDTO;
+import com.example.jpa.dto.UserDTO;
 import com.example.jpa.entity.User;
 import com.example.jpa.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,9 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * 用户控制器类，演示JPA的REST API接口
+ * 用户控制器类，演示JPA基本注解和CRUD操作的REST API接口
  */
 @RestController
 @RequestMapping("/users")
@@ -31,8 +34,9 @@ public class UserController {
      */
     @PostMapping
     @Operation(summary = "创建用户", description = "创建一个新用户")
-    public User createUser(@RequestBody User user) {
-        return userService.saveUser(user);
+    public UserDTO createUser(@RequestBody User user) {
+        User savedUser = userService.saveUser(user);
+        return Mapper.toUserDTO(savedUser);
     }
     
     /**
@@ -43,8 +47,11 @@ public class UserController {
      */
     @PostMapping("/batch")
     @Operation(summary = "批量创建用户", description = "批量创建多个用户")
-    public List<User> createUsers(@RequestBody List<User> users) {
-        return userService.saveUsers(users);
+    public List<UserDTO> createUsers(@RequestBody List<User> users) {
+        List<User> savedUsers = userService.saveUsers(users);
+        return savedUsers.stream()
+                .map(Mapper::toUserDTO)
+                .collect(Collectors.toList());
     }
     
     /**
@@ -55,8 +62,9 @@ public class UserController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据ID获取用户", description = "通过用户ID获取用户信息")
-    public User getUserById(@Parameter(description = "用户ID") @PathVariable Long id) {
-        return userService.findUserById(id);
+    public UserDTO getUserById(@Parameter(description = "用户ID") @PathVariable Long id) {
+        User user = userService.findUserById(id);
+        return Mapper.toUserDTO(user);
     }
     
     /**
@@ -66,8 +74,11 @@ public class UserController {
      */
     @GetMapping
     @Operation(summary = "获取所有用户", description = "获取系统中所有用户列表")
-    public List<User> getAllUsers() {
-        return userService.findAllUsers();
+    public List<UserDTO> getAllUsers() {
+        List<User> users = userService.findAllUsers();
+        return users.stream()
+                .map(Mapper::toUserDTO)
+                .collect(Collectors.toList());
     }
     
     /**
@@ -79,10 +90,11 @@ public class UserController {
      */
     @GetMapping("/page")
     @Operation(summary = "分页获取用户", description = "分页查询用户列表")
-    public Page<User> getUsersWithPagination(
+    public Page<UserDTO> getUsersWithPagination(
             @Parameter(description = "页码（从0开始）") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "每页大小") @RequestParam(defaultValue = "10") int size) {
-        return userService.findUsersWithPagination(page, size);
+        Page<User> users = userService.findUsersWithPagination(page, size);
+        return users.map(Mapper::toUserDTO);
     }
     
     /**
@@ -93,8 +105,9 @@ public class UserController {
      */
     @GetMapping("/username/{username}")
     @Operation(summary = "根据用户名获取用户", description = "通过用户名获取用户信息")
-    public User getUserByUsername(@Parameter(description = "用户名") @PathVariable String username) {
-        return userService.findUserByUsername(username);
+    public UserDTO getUserByUsername(@Parameter(description = "用户名") @PathVariable String username) {
+        User user = userService.findUserByUsername(username);
+        return Mapper.toUserDTO(user);
     }
     
     /**
@@ -105,8 +118,11 @@ public class UserController {
      */
     @GetMapping("/search")
     @Operation(summary = "根据用户名模糊查询用户", description = "根据用户名进行模糊搜索")
-    public List<User> searchUsers(@Parameter(description = "用户名") @RequestParam String username) {
-        return userService.findUsersByUsernameContaining(username);
+    public List<UserDTO> searchUsers(@Parameter(description = "用户名") @RequestParam String username) {
+        List<User> users = userService.findUsersByUsernameContaining(username);
+        return users.stream()
+                .map(Mapper::toUserDTO)
+                .collect(Collectors.toList());
     }
     
     /**
@@ -117,11 +133,45 @@ public class UserController {
      * @return 用户列表
      */
     @GetMapping("/age")
-    @Operation(summary = "根据年龄范围查询用户", description = "查询指定年龄范围内的用户")
-    public List<User> getUsersByAgeRange(
-            @Parameter(description = "最小年龄") @RequestParam Integer minAge,
-            @Parameter(description = "最大年龄") @RequestParam Integer maxAge) {
-        return userService.findUsersByAgeRange(minAge, maxAge);
+    @Operation(summary = "根据年龄范围查询用户", description = "根据年龄范围查询用户")
+    public List<UserDTO> getUsersByAgeRange(
+            @Parameter(description = "最小年龄") @RequestParam int minAge,
+            @Parameter(description = "最大年龄") @RequestParam int maxAge) {
+        List<User> users = userService.findUsersByAgeRange(minAge, maxAge);
+        return users.stream()
+                .map(Mapper::toUserDTO)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 为用户分配项目
+     * 
+     * @param userId 用户ID
+     * @param projectId 项目ID
+     * @return 更新后的用户对象
+     */
+    @PutMapping("/{userId}/projects/{projectId}")
+    @Operation(summary = "为用户分配项目", description = "将指定用户分配到指定项目")
+    public UserDTO assignProjectToUser(
+            @Parameter(description = "用户ID") @PathVariable Long userId,
+            @Parameter(description = "项目ID") @PathVariable Long projectId) {
+        User user = userService.assignProjectToUser(userId, projectId);
+        return Mapper.toUserDTO(user);
+    }
+    
+    /**
+     * 获取指定用户参与的所有项目
+     * 
+     * @param userId 用户ID
+     * @return 项目列表
+     */
+    @GetMapping("/{userId}/projects")
+    @Operation(summary = "获取指定用户参与的所有项目", description = "获取指定用户参与的所有项目列表")
+    public List<ProjectDTO> getProjectsByUserId(@Parameter(description = "用户ID") @PathVariable Long userId) {
+        User user = userService.findUserById(userId);
+        return user.getProjects().stream()
+                .map(Mapper::toProjectDTO)
+                .collect(Collectors.toList());
     }
     
     /**
@@ -129,15 +179,14 @@ public class UserController {
      * 
      * @param username 用户名
      * @param email 新邮箱
-     * @return 更新结果
+     * @return 更新记录数
      */
-    @PutMapping("/{username}/email")
-    @Operation(summary = "更新用户邮箱", description = "更新指定用户的邮箱地址")
-    public String updateUserEmail(
-            @Parameter(description = "用户名") @PathVariable String username,
+    @PutMapping("/email")
+    @Operation(summary = "更新用户邮箱", description = "根据用户名更新用户邮箱")
+    public int updateUserEmail(
+            @Parameter(description = "用户名") @RequestParam String username,
             @Parameter(description = "新邮箱") @RequestParam String email) {
-        int result = userService.updateUserEmail(username, email);
-        return "Updated " + result + " user(s)";
+        return userService.updateUserEmail(username, email);
     }
     
     /**

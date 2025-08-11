@@ -1,5 +1,8 @@
 package com.example.jpa.controller;
 
+import com.example.jpa.dto.DepartmentDTO;
+import com.example.jpa.dto.Mapper;
+import com.example.jpa.dto.UserDTO;
 import com.example.jpa.entity.Department;
 import com.example.jpa.entity.User;
 import com.example.jpa.service.DepartmentService;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 部门控制器类，演示JPA一对多关系的REST API接口
@@ -31,20 +35,9 @@ public class DepartmentController {
      */
     @PostMapping
     @Operation(summary = "创建部门", description = "创建一个新部门")
-    public Department createDepartment(@RequestBody Department department) {
-        return departmentService.saveDepartment(department);
-    }
-    
-    /**
-     * 批量创建部门
-     * 
-     * @param departments 部门列表
-     * @return 创建后的部门列表
-     */
-    @PostMapping("/batch")
-    @Operation(summary = "批量创建部门", description = "批量创建多个部门")
-    public List<Department> createDepartments(@RequestBody List<Department> departments) {
-        return departmentService.saveDepartments(departments);
+    public DepartmentDTO createDepartment(@RequestBody Department department) {
+        Department savedDepartment = departmentService.saveDepartment(department);
+        return Mapper.toDepartmentDTO(savedDepartment);
     }
     
     /**
@@ -55,8 +48,9 @@ public class DepartmentController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "根据ID获取部门", description = "通过部门ID获取部门信息")
-    public Department getDepartmentById(@Parameter(description = "部门ID") @PathVariable Long id) {
-        return departmentService.findDepartmentById(id);
+    public DepartmentDTO getDepartmentById(@Parameter(description = "部门ID") @PathVariable Long id) {
+        Department department = departmentService.findDepartmentById(id);
+        return Mapper.toDepartmentDTO(department);
     }
     
     /**
@@ -66,8 +60,11 @@ public class DepartmentController {
      */
     @GetMapping
     @Operation(summary = "获取所有部门", description = "获取系统中所有部门列表")
-    public List<Department> getAllDepartments() {
-        return departmentService.findAllDepartments();
+    public List<DepartmentDTO> getAllDepartments() {
+        List<Department> departments = departmentService.findAllDepartments();
+        return departments.stream()
+                .map(Mapper::toDepartmentDTO)
+                .collect(Collectors.toList());
     }
     
     /**
@@ -79,10 +76,11 @@ public class DepartmentController {
      */
     @GetMapping("/page")
     @Operation(summary = "分页获取部门", description = "分页查询部门列表")
-    public Page<Department> getDepartmentsWithPagination(
+    public Page<DepartmentDTO> getDepartmentsWithPagination(
             @Parameter(description = "页码（从0开始）") @RequestParam(defaultValue = "0") int page,
             @Parameter(description = "每页大小") @RequestParam(defaultValue = "10") int size) {
-        return departmentService.findDepartmentsWithPagination(page, size);
+        Page<Department> departments = departmentService.findDepartmentsWithPagination(page, size);
+        return departments.map(Mapper::toDepartmentDTO);
     }
     
     /**
@@ -93,8 +91,9 @@ public class DepartmentController {
      */
     @GetMapping("/name/{name}")
     @Operation(summary = "根据部门名称获取部门", description = "通过部门名称获取部门信息")
-    public Department getDepartmentByName(@Parameter(description = "部门名称") @PathVariable String name) {
-        return departmentService.findDepartmentByName(name);
+    public DepartmentDTO getDepartmentByName(@Parameter(description = "部门名称") @PathVariable String name) {
+        Department department = departmentService.findDepartmentByName(name);
+        return Mapper.toDepartmentDTO(department);
     }
     
     /**
@@ -105,23 +104,27 @@ public class DepartmentController {
      */
     @GetMapping("/search")
     @Operation(summary = "根据部门名称模糊查询部门", description = "根据部门名称进行模糊搜索")
-    public List<Department> searchDepartments(@Parameter(description = "部门名称") @RequestParam String name) {
-        return departmentService.findDepartmentsByNameContaining(name);
+    public List<DepartmentDTO> searchDepartments(@Parameter(description = "部门名称") @RequestParam String name) {
+        List<Department> departments = departmentService.findDepartmentsByNameContaining(name);
+        return departments.stream()
+                .map(Mapper::toDepartmentDTO)
+                .collect(Collectors.toList());
     }
     
     /**
-     * 为用户分配部门
+     * 为部门分配用户
      * 
-     * @param userId 用户ID
      * @param departmentId 部门ID
-     * @return 更新后的用户对象
+     * @param userId 用户ID
+     * @return 更新后的部门对象
      */
     @PutMapping("/{departmentId}/users/{userId}")
-    @Operation(summary = "为用户分配部门", description = "将指定用户分配到指定部门")
-    public User assignUserToDepartment(
-            @Parameter(description = "用户ID") @PathVariable Long userId,
-            @Parameter(description = "部门ID") @PathVariable Long departmentId) {
-        return departmentService.assignUserToDepartment(userId, departmentId);
+    @Operation(summary = "为部门分配用户", description = "将指定用户分配到指定部门")
+    public DepartmentDTO assignUserToDepartment(
+            @Parameter(description = "部门ID") @PathVariable Long departmentId,
+            @Parameter(description = "用户ID") @PathVariable Long userId) {
+        Department department = departmentService.assignUserToDepartment(departmentId, userId);
+        return Mapper.toDepartmentDTO(department);
     }
     
     /**
@@ -132,8 +135,11 @@ public class DepartmentController {
      */
     @GetMapping("/{id}/users")
     @Operation(summary = "获取指定部门下的所有用户", description = "获取指定部门下的所有用户列表")
-    public List<User> getUsersByDepartmentId(@Parameter(description = "部门ID") @PathVariable Long id) {
-        return departmentService.findUsersByDepartmentId(id);
+    public List<UserDTO> getUsersByDepartmentId(@Parameter(description = "部门ID") @PathVariable Long id) {
+        List<User> users = departmentService.findUsersByDepartmentId(id);
+        return users.stream()
+                .map(Mapper::toUserDTO)
+                .collect(Collectors.toList());
     }
     
     /**

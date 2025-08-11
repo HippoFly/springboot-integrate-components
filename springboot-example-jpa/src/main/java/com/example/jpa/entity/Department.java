@@ -1,11 +1,13 @@
 package com.example.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,7 +55,7 @@ public class Department {
      * 与User的一对多关系
      */
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<User> users;
+    private List<User> users = new ArrayList<>();
     
     @PreUpdate
     public void preUpdate() {

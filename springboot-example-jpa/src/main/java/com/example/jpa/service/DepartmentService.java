@@ -99,21 +99,21 @@ public class DepartmentService {
     }
     
     /**
-     * 为用户分配部门
+     * 为部门分配用户
      * 
-     * @param userId 用户ID
      * @param departmentId 部门ID
-     * @return 更新后的用户对象
+     * @param userId 用户ID
+     * @return 更新后的部门对象
      */
-    public User assignUserToDepartment(Long userId, Long departmentId) {
-        User user = userRepository.findById(userId).orElse(null);
+    public Department assignUserToDepartment(Long departmentId, Long userId) {
         Department department = departmentRepository.findById(departmentId).orElse(null);
+        User user = userRepository.findById(userId).orElse(null);
         
-        if (user != null && department != null) {
+        if (department != null && user != null) {
             user.setDepartment(department);
-            return userRepository.save(user);
+            userRepository.save(user);
         }
-        return null;
+        return department;
     }
     
     /**
@@ -123,11 +123,7 @@ public class DepartmentService {
      * @return 用户列表
      */
     public List<User> findUsersByDepartmentId(Long departmentId) {
-        Department department = departmentRepository.findById(departmentId).orElse(null);
-        if (department != null) {
-            return department.getUsers();
-        }
-        return null;
+        return userRepository.findByDepartmentId(departmentId);
     }
     
     /**

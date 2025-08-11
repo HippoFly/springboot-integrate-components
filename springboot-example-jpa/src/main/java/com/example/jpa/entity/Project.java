@@ -1,5 +1,6 @@
 package com.example.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -71,7 +72,7 @@ public class Project {
         joinColumns = @JoinColumn(name = "project_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> users = new ArrayList<>(); // 初始化为空列表，避免null值
+    private List<User> users = new ArrayList<>();
     
     @PreUpdate
     public void preUpdate() {

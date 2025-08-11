@@ -98,12 +98,12 @@
    ```
 
 4. 访问Swagger UI（API文档）：
-   浏览器访问 `http://localhost:8080/swagger-ui.html`
+   浏览器访问 `http://localhost:8280/swagger-ui.html`
 
 5. 使用REST API测试功能：
-   - 创建用户：`POST http://localhost:8080/users`
-   - 查询用户：`GET http://localhost:8080/users`
-   - 分页查询：`GET http://localhost:8080/users/page?page=0&size=5`
+   - 创建用户：`POST http://localhost:8280/users`
+   - 查询用户：`GET http://localhost:8280/users`
+   - 分页查询：`GET http://localhost:8280/users/page?page=0&size=5`
 
 ## 学习要点
 

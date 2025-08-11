@@ -70,6 +70,14 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     List<User> findByAgeGreaterThan(Integer age);
     
     /**
+     * 根据部门ID查找用户列表
+     * 
+     * @param departmentId 部门ID
+     * @return 用户列表
+     */
+    List<User> findByDepartmentId(Long departmentId);
+    
+    /**
      * 查询指定年龄的用户并按用户名排序
      * 
      * @param age 年龄
@@ -114,6 +122,18 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Transactional
     @Query("UPDATE User u SET u.email = :email WHERE u.username = :username")
     int updateUserEmail(@Param("email") String email, @Param("username") String username);
+    
+    /**
+     * 根据用户名更新用户邮箱
+     * 
+     * @param username 用户名
+     * @param email 新邮箱
+     * @return 更新记录数
+     */
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.email = :email WHERE u.username = :username")
+    int updateEmailByUsername(@Param("username") String username, @Param("email") String email);
     
     /**
      * 使用原生SQL查询 - 根据邮箱查询用户

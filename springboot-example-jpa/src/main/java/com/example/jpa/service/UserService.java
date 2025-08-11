@@ -1,6 +1,8 @@
 package com.example.jpa.service;
 
+import com.example.jpa.entity.Project;
 import com.example.jpa.entity.User;
+import com.example.jpa.repository.ProjectRepository;
 import com.example.jpa.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,13 +15,16 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * 用户服务类，演示常用的JPA操作方法
+ * 用户服务类，演示JPA基本注解和CRUD操作
  */
 @Service
 public class UserService {
     
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private ProjectRepository projectRepository;
     
     /**
      * 保存用户
@@ -94,7 +99,7 @@ public class UserService {
     }
     
     /**
-     * 根据年龄范围查询用户
+     * 根据年龄范围查找用户
      * 
      * @param minAge 最小年龄
      * @param maxAge 最大年龄
@@ -105,6 +110,24 @@ public class UserService {
     }
     
     /**
+     * 为用户分配项目
+     * 
+     * @param userId 用户ID
+     * @param projectId 项目ID
+     * @return 更新后的用户对象
+     */
+    public User assignProjectToUser(Long userId, Long projectId) {
+        User user = userRepository.findById(userId).orElse(null);
+        Project project = projectRepository.findById(projectId).orElse(null);
+        
+        if (user != null && project != null) {
+            user.getProjects().add(project);
+            return userRepository.save(user);
+        }
+        return null;
+    }
+    
+    /**
      * 更新用户邮箱
      * 
      * @param username 用户名
@@ -112,7 +135,7 @@ public class UserService {
      * @return 更新记录数
      */
     public int updateUserEmail(String username, String email) {
-        return userRepository.updateUserEmail(email, username);
+        return userRepository.updateEmailByUsername(username, email);
     }
     
     /**

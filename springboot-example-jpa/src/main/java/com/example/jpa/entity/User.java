@@ -67,7 +67,7 @@ public class User {
      * 参与的项目 - 多对多关系
      */
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
-    private List<Project> projects = new ArrayList<>(); // 初始化为空列表，避免null值
+    private List<Project> projects = new ArrayList<>();
     
     @PreUpdate
     public void preUpdate() {
