@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import javax.persistence.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "user")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -67,6 +70,7 @@ public class User {
      * 参与的项目 - 多对多关系
      */
     @ManyToMany(mappedBy = "users", fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private List<Project> projects = new ArrayList<>();
     
     @PreUpdate

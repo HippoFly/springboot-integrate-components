@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false">
+
+    <!-- 默认缓存配置 -->
+    <defaultCache
+            maxElementsInMemory="1000"
+            eternal="false"
+            timeToIdleSeconds="300"
+            timeToLiveSeconds="600"
+            overflowToDisk="false"
+            diskPersistent="false"
+            memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- 用户实体缓存 -->
+    <cache name="com.example.jpa.entity.User"
+           maxElementsInMemory="500"
+           eternal="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- 部门实体缓存 -->
+    <cache name="com.example.jpa.entity.Department"
+           maxElementsInMemory="200"
+           eternal="false"
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="1200"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- 项目实体缓存 -->
+    <cache name="com.example.jpa.entity.Project"
+           maxElementsInMemory="300"
+           eternal="false"
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="1200"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- 员工实体缓存 -->
+    <cache name="com.example.jpa.entity.Employee"
+           maxElementsInMemory="1000"
+           eternal="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- 角色实体缓存 -->
+    <cache name="com.example.jpa.entity.Role"
+           maxElementsInMemory="100"
+           eternal="false"
+           timeToIdleSeconds="1200"
+           timeToLiveSeconds="3600"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- 查询结果缓存 -->
+    <cache name="org.hibernate.cache.internal.StandardQueryCache"
+           maxElementsInMemory="100"
+           eternal="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- 查询时间戳缓存 -->
+    <cache name="org.hibernate.cache.spi.UpdateTimestampsCache"
+           maxElementsInMemory="5000"
+           eternal="true"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <!-- 集合缓存 -->
+    <cache name="com.example.jpa.entity.Department.users"
+           maxElementsInMemory="200"
+           eternal="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="com.example.jpa.entity.User.projects"
+           maxElementsInMemory="500"
+           eternal="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+    <cache name="com.example.jpa.entity.Project.users"
+           maxElementsInMemory="300"
+           eternal="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="600"
+           overflowToDisk="false"
+           diskPersistent="false"
+           memoryStoreEvictionPolicy="LRU"/>
+
+</ehcache>

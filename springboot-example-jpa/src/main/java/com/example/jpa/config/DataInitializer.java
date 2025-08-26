@@ -1,11 +1,8 @@
 package com.example.jpa.config;
 
-import com.example.jpa.entity.Department;
-import com.example.jpa.entity.Project;
-import com.example.jpa.entity.User;
-import com.example.jpa.repository.DepartmentRepository;
-import com.example.jpa.repository.ProjectRepository;
-import com.example.jpa.repository.UserRepository;
+import com.example.jpa.entity.*;
+import com.example.jpa.repository.*;
+import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -30,6 +27,15 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private ProjectRepository projectRepository;
     
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    
+    @Autowired
+    private RoleRepository roleRepository;
+    
+    @Autowired
+    private UserRoleRepository userRoleRepository;
+    
     @Override
     public void run(String... args) throws Exception {
         // 检查是否已有数据，如果有则不初始化
@@ -52,10 +58,22 @@ public class DataInitializer implements CommandLineRunner {
         // 为用户和项目建立多对多关系
         assignUsersToProjects(users, projects);
         
+        // 创建角色
+        List<Role> roles = createRoles();
+        
+        // 创建员工数据
+        createEmployees(departments);
+        
+        // 为用户分配角色
+        assignRolesToUsers(users, roles);
+        
         System.out.println("数据初始化完成");
         System.out.println("部门数量: " + departmentRepository.count());
         System.out.println("用户数量: " + userRepository.count());
         System.out.println("项目数量: " + projectRepository.count());
+        System.out.println("角色数量: " + roleRepository.count());
+        System.out.println("员工数量: " + employeeRepository.count());
+        System.out.println("用户角色关联数量: " + userRoleRepository.count());
     }
     
     /**
@@ -204,5 +222,104 @@ public class DataInitializer implements CommandLineRunner {
         }
         
         System.out.println("已完成用户和项目的关联分配");
+    }
+    
+    /**
+     * 创建角色
+     */
+    private List<Role> createRoles() {
+        List<Role> roles = new ArrayList<>();
+        
+        String[] roleNames = {"管理员", "开发者", "测试员", "产品经理", "设计师"};
+        String[] roleDescriptions = {
+            "系统管理员，拥有所有权限",
+            "软件开发人员，负责编码实现",
+            "质量保证人员，负责测试验证",
+            "产品规划人员，负责需求管理",
+            "界面设计人员，负责用户体验"
+        };
+        
+        for (int i = 0; i < roleNames.length; i++) {
+            Role role = new Role();
+            role.setRoleName(roleNames[i]);
+            role.setDescription(roleDescriptions[i]);
+            role.setStatus(Role.RoleStatus.ACTIVE);
+            roles.add(roleRepository.save(role));
+        }
+        
+        System.out.println("创建了 " + roles.size() + " 个角色");
+        return roles;
+    }
+    
+    /**
+     * 创建员工（全职和兼职）
+     */
+    private List<Employee> createEmployees(List<Department> departments) {
+        List<Employee> employees = new ArrayList<>();
+        Random random = new Random();
+        
+        // 创建10个全职员工
+        for (int i = 0; i < 10; i++) {
+            FullTimeEmployee employee = new FullTimeEmployee();
+            employee.setEmployeeCode("FT" + String.format("%03d", i + 1));
+            employee.setName("全职员工" + (i + 1));
+            employee.setEmail("fulltime" + (i + 1) + "@company.com");
+            employee.setBaseSalary(new BigDecimal(8000 + random.nextInt(7000)));
+            employee.setDepartment(departments.get(random.nextInt(departments.size())));
+            employee.setAnnualLeaveDays(15 + random.nextInt(6));
+            employee.setPerformanceBonus(new BigDecimal(random.nextInt(5000)));
+            employee.setSocialSecurityBase(new BigDecimal(5000 + random.nextInt(3000)));
+            employees.add(employeeRepository.save(employee));
+        }
+        
+        // 创建5个兼职员工
+        for (int i = 0; i < 5; i++) {
+            PartTimeEmployee employee = new PartTimeEmployee();
+            employee.setEmployeeCode("PT" + String.format("%03d", i + 1));
+            employee.setName("兼职员工" + (i + 1));
+            employee.setEmail("parttime" + (i + 1) + "@company.com");
+            employee.setBaseSalary(new BigDecimal(3000 + random.nextInt(2000)));
+            employee.setDepartment(departments.get(random.nextInt(departments.size())));
+            employee.setHourlyRate(new BigDecimal(50 + random.nextInt(50)));
+            employee.setHoursPerWeek(20 + random.nextInt(20));
+            employee.setContractEndDate(java.time.LocalDate.now().plusMonths(6 + random.nextInt(12)));
+            employees.add(employeeRepository.save(employee));
+        }
+        
+        System.out.println("创建了 " + employees.size() + " 个员工");
+        return employees;
+    }
+    
+    /**
+     * 为用户分配角色
+     */
+    private void assignRolesToUsers(List<User> users, List<Role> roles) {
+        Random random = new Random();
+        
+        for (User user : users) {
+            // 每个用户随机分配1-3个角色
+            int roleCount = 1 + random.nextInt(3);
+            List<Role> availableRoles = new ArrayList<>(roles);
+            
+            for (int i = 0; i < roleCount && !availableRoles.isEmpty(); i++) {
+                Role role = availableRoles.get(random.nextInt(availableRoles.size()));
+                availableRoles.remove(role);
+                
+                UserRole userRole = new UserRole();
+                UserRoleId userRoleId = new UserRoleId();
+                userRoleId.setUserId(user.getId());
+                userRoleId.setRoleId(role.getId());
+                userRole.setId(userRoleId);
+                userRole.setUser(user);
+                userRole.setRole(role);
+                userRole.setAssignedDate(LocalDateTime.now());
+                userRole.setExpireDate(LocalDateTime.now().plusYears(1));
+                userRole.setIsActive(true);
+                
+                userRoleRepository.save(userRole);
+            }
+        }
+        
+        System.out.println("已完成用户角色分配");
     }
 }

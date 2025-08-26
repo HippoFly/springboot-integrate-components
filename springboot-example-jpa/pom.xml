@@ -63,6 +63,29 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- Hibernate 二级缓存 -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+            <version>5.6.15.Final</version>
+        </dependency>
+        <!-- EhCache 缓存实现 -->
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>2.10.9.2</version>
+        </dependency>
+        <!-- Spring Cache 支持 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <!-- H2 内存数据库（用于测试） -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>

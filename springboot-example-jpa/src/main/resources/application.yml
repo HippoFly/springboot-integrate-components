@@ -21,6 +21,24 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        # 启用二级缓存
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+        # 统计信息
+        generate_statistics: true
+        # 缓存配置文件路径
+        javax:
+          cache:
+            provider: org.ehcache.jsr107.EhcacheCachingProvider
+  
+  # 缓存配置
+  cache:
+    type: ehcache
+    ehcache:
+      config: classpath:ehcache.xml
   
   # H2控制台配置移除
 

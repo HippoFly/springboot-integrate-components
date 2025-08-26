@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import javax.persistence.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "department")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -55,6 +58,7 @@ public class Department {
      * 与User的一对多关系
      */
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private List<User> users = new ArrayList<>();
     
     @PreUpdate

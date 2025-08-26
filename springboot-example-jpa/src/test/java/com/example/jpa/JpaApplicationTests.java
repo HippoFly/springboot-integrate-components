@@ -6,6 +6,7 @@ import com.example.jpa.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
@@ -15,6 +16,15 @@ import static org.junit.jupiter.api.Assertions.*;
  * JPA应用测试类
  */
 @SpringBootTest
+@TestPropertySource(properties = {
+    "spring.datasource.url=jdbc:h2:mem:testdb",
+    "spring.datasource.driver-class-name=org.h2.Driver",
+    "spring.datasource.username=sa",
+    "spring.datasource.password=",
+    "spring.jpa.hibernate.ddl-auto=create-drop",
+    "spring.jpa.properties.hibernate.cache.use_second_level_cache=false",
+    "spring.jpa.properties.hibernate.cache.use_query_cache=false"
+})
 class JpaApplicationTests {
     
     @Autowired
