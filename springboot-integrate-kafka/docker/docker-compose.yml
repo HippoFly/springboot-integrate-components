@@ -1,0 +1,75 @@
+# docker compose v2 不强制写 version 字段；如果你写了也没问题（例如 version: "3.9"）
+# 这个文件描述了两个服务：Kafka（KRaft 模式）和一个 Web UI（kafka-ui）
+name: kafka-local # 容器组 命名 
+
+services:                              # 定义一组要一起编排的容器服务
+  kafka:                               # 服务名（同一个 compose 网络内，其他容器可用主机名 'kafka' 访问它）
+    image: bitnami/kafka:3.6           # 使用 Bitnami 的 Kafka 镜像，3.6 只是示例；面试/对齐公司优先选 3.7~4.0 KRaft
+                                        # Bitnami 镜像是多架构，多数情况下 M2 (arm64) 直接可用，无需设置 platform
+    container_name: kafka              # 指定容器名，方便你用 docker 命令定位；不写则会自动生成带前缀的名字
+    # platform: linux/arm64            # （可选）强制平台。M2 下通常不需要；若要在 Intel Mac 上跑 arm64 才需要
+
+    ports:                             # 宿主机端口映射：左边是 Mac 端口，右边是容器内部端口
+      - "29092:29092"                  # 映射给“外部/本机”访问的监听（PLAINTEXT_HOST），Mac 上的应用连 localhost:29092
+      - "9092:9092"                    # 供“容器内其它服务”访问的监听（PLAINTEXT），同一网络内用 kafka:9092
+      - "9093:9093"                    # KRaft 控制器监听（CONTROLLER），单节点也需要
+
+    environment:                       # 通过环境变量配置 Kafka（Bitnami 会把这些转成 server.properties）
+      - KAFKA_ENABLE_KRAFT=yes         # 关键开关：启用 KRaft（无 ZooKeeper）
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller 
+                                        # 该节点同时承担 broker 和 controller 两种角色（单机 KRaft 常用）
+      - KAFKA_CFG_NODE_ID=1            # 本节点在 KRaft 集群中的节点 ID，必须与下面的 voters 一致（1@...）
+
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+                                        # 指定哪个监听名用于 controller 通信；需与 LISTENERS 中的 CONTROLLER 对应
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+                                        # KRaft 法定人数投票地址列表：<nodeId>@<host>:<port>
+                                        # 单机：只有一个 voter（nodeId=1），host 用容器内能解析到的主机名 'kafka'，端口 9093
+
+      # 定义三类监听（Listener）：
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,PLAINTEXT_HOST://:29092,CONTROLLER://:9093
+                                        # 语法：<名称>://<绑定地址>:<端口>
+                                        # 这里绑定到 0.0.0.0（留空即 :port），容器会在内部监听 9092/29092/9093 三个端口
+                                        # - PLAINTEXT：给“容器内其他服务”访问
+                                        # - PLAINTEXT_HOST：给“宿主机/外部”访问（端口 29092）
+                                        # - CONTROLLER：KRaft 控制器专用
+
+      # 告诉客户端“我是谁、在哪儿”（客户端用它来回连）：
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+                                        # - 对同网络的容器：宣称地址是 kafka:9092（kafka 是本服务主机名）
+                                        # - 对宿主机应用：宣称地址是 localhost:29092
+                                        # 注意：Advertised 地址必须是“对调用方可达”的地址，否则客户端拿到地址后连不上
+
+      # 将监听名映射到安全协议（这里全是明文，便于本地开发）
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+
+      # 开启自动建主题（仅开发环境方便，生产通常关掉）
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+
+      # 自动建主题的默认分区数（单机设 1 即可；生产按吞吐与并行度规划）
+      - KAFKA_CFG_NUM_PARTITIONS=1
+
+      # Bitnami 兼容性开关：允许使用 PLAINTEXT（否则镜像会强制你用更安全的配置）
+      - ALLOW_PLAINTEXT_LISTENER=yes
+
+    volumes:
+      - kafka_data:/bitnami/kafka       # 挂载数据卷以持久化（包含日志、元数据）；删除卷会清空数据
+
+    # restart: unless-stopped           # （推荐）容器异常退出自动拉起；本地开发可按需开启
+    # healthcheck:                      # （可选）健康检查，确保 broker 就绪后再让其他服务工作
+    #   test: ["CMD-SHELL", "kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 12
+
+  kafka-ui:                             # Web 管理界面（查看 topic、分区、消费组、生产/消费消息等）
+    image: provectuslabs/kafka-ui:latest
+    depends_on: [kafka]                 # 等 kafka 服务先起来（不是强一致保证，但能改善启动顺序）
+    ports: ["8080:8080"]                # 浏览器访问 http://localhost:8080
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local     # UI 里显示的集群昵称
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+                                        # UI 连 Kafka 用容器内地址（同网络通信），所以用 kafka:9092
+
+volumes:
+  kafka_data: {}                        # 声明一个名为 kafka_data 的匿名卷；Docker 会负责生命周期管理

@@ -2,6 +2,27 @@ server:
   port: 8980
 
 spring:
+  application:
+    name: springboot-integrate-kafka
+  
+  # 数据库配置 - 使用统一数据库
+  datasource:
+    url: jdbc:mysql://localhost:3306/my-generated-db?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    open-in-view: false
+  
   kafka:
     bootstrap-servers: localhost:29092   # ← 关键！连宿主机端口
     producer:
