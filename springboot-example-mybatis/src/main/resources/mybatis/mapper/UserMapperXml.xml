@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mybatis.mapper.UserMapperXml">
+
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.example.mybatis.entity.UserEntity">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="username" property="username" jdbcType="VARCHAR"/>
+        <result column="real_name" property="realName" jdbcType="VARCHAR"/>
+        <result column="email" property="email" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="INTEGER"/>
+        <result column="gender" property="gender" jdbcType="VARCHAR"/>
+        <result column="phone" property="phone" jdbcType="VARCHAR"/>
+        <result column="department_id" property="departmentId" jdbcType="BIGINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="created_by" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="updated_by" property="updatedBy" jdbcType="VARCHAR"/>
+        <result column="version" property="version" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <!-- 用户与部门关联映射 -->
+    <resultMap id="UserWithDepartmentResultMap" type="com.example.mybatis.entity.UserEntity" extends="BaseResultMap">
+        <association property="department" javaType="com.example.mybatis.entity.DeptEntity">
+            <id column="dept_id" property="id" jdbcType="BIGINT"/>
+            <result column="dept_name" property="name" jdbcType="VARCHAR"/>
+            <result column="dept_description" property="description" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <!-- 基础字段列表 -->
+    <sql id="Base_Column_List">
+        id, username, real_name, email, age, gender, phone, department_id,
+        create_time, update_time, created_by, updated_by, version
+    </sql>
+
+    <!-- 动态WHERE条件 -->
+    <sql id="Dynamic_Where_Clause">
+        <where>
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="minAge != null">AND age &gt;= #{minAge}</if>
+            <if test="maxAge != null">AND age &lt;= #{maxAge}</if>
+            <if test="gender != null and gender != ''">AND gender = #{gender}</if>
+            <if test="departmentId != null">AND department_id = #{departmentId}</if>
+        </where>
+    </sql>
+
+    <!-- 根据ID查询 -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users WHERE id = #{id}
+    </select>
+
+    <!-- 根据用户名查询 -->
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users WHERE username = #{username}
+    </select>
+
+    <!-- 插入用户 -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, real_name, email, age, gender, phone, department_id,
+                          create_time, update_time, created_by, updated_by, version)
+        VALUES (#{username}, #{realName}, #{email}, #{age}, #{gender}, #{phone}, #{departmentId},
+                #{createTime}, #{updateTime}, #{createdBy}, #{updatedBy}, #{version})
+    </insert>
+
+    <!-- 选择性更新 -->
+    <update id="updateSelective">
+        UPDATE users
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="departmentId != null">department_id = #{departmentId},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updatedBy != null">updated_by = #{updatedBy},</if>
+            <if test="version != null">version = #{version},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除用户 -->
+    <delete id="deleteById">
+        DELETE FROM users WHERE id = #{id}
+    </delete>
+
+    <!-- 多条件动态查询 -->
+    <select id="selectByConditions" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users
+        <include refid="Dynamic_Where_Clause"/>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 用户名模糊查询 -->
+    <select id="selectByUsernameLike" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users
+        WHERE username LIKE CONCAT('%', #{username}, '%')
+        ORDER BY username
+    </select>
+
+    <!-- 年龄范围查询 -->
+    <select id="selectByAgeRange" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users
+        <where>
+            <if test="minAge != null">AND age &gt;= #{minAge}</if>
+            <if test="maxAge != null">AND age &lt;= #{maxAge}</if>
+        </where>
+        ORDER BY age
+    </select>
+
+    <!-- 根据部门查询用户 -->
+    <select id="selectByDepartmentId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users WHERE department_id = #{departmentId}
+    </select>
+
+    <!-- 根据性别查询用户 -->
+    <select id="selectByGender" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users WHERE gender = #{gender}
+    </select>
+
+    <!-- 用户与部门关联查询 -->
+    <select id="selectWithDepartment" resultMap="UserWithDepartmentResultMap">
+        SELECT u.id, u.username, u.real_name, u.email, u.age, u.gender, u.phone, u.department_id,
+               u.create_time, u.update_time, u.created_by, u.updated_by, u.version,
+               d.id as dept_id, d.name as dept_name, d.description as dept_description
+        FROM users u
+        LEFT JOIN departments d ON u.department_id = d.id
+        WHERE u.id = #{id}
+    </select>
+
+    <!-- 分页查询 -->
+    <select id="selectWithPagination" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users
+        ORDER BY create_time DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <!-- 查询总数 -->
+    <select id="countTotal" resultType="long">
+        SELECT COUNT(*) FROM users
+    </select>
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (username, real_name, email, age, gender, phone, department_id,
+                          create_time, update_time, created_by, updated_by, version)
+        VALUES
+        <foreach collection="users" item="user" separator=",">
+            (#{user.username}, #{user.realName}, #{user.email}, #{user.age}, #{user.gender}, 
+             #{user.phone}, #{user.departmentId}, #{user.createTime}, #{user.updateTime}, 
+             #{user.createdBy}, #{user.updatedBy}, #{user.version})
+        </foreach>
+    </insert>
+
+    <!-- 批量删除 -->
+    <delete id="batchDelete">
+        DELETE FROM users WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 按部门统计用户数量 -->
+    <select id="countUsersByDepartment" resultType="map">
+        SELECT d.name as departmentName, COUNT(u.id) as userCount
+        FROM departments d
+        LEFT JOIN users u ON d.id = u.department_id
+        GROUP BY d.id, d.name
+        ORDER BY userCount DESC
+    </select>
+
+    <!-- 按性别统计用户数量 -->
+    <select id="countUsersByGender" resultType="map">
+        SELECT gender, COUNT(*) as count
+        FROM users
+        GROUP BY gender
+    </select>
+
+    <!-- 时间范围查询 -->
+    <select id="selectByCreateTimeRange" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users
+        WHERE create_time BETWEEN #{startTime} AND #{endTime}
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 最近N天创建的用户 -->
+    <select id="selectRecentCreated" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM users
+        WHERE create_time >= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        ORDER BY create_time DESC
+    </select>
+
+</mapper>

@@ -8,14 +8,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * 部门实体类 - MyBatis版本
- * 对应数据库表：departments
- * 展示MyBatis一对多关联查询
+ * 角色实体类 - MyBatis版本
+ * 对应数据库表：roles
+ * 展示MyBatis多对多关联查询
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeptEntity {
+public class RoleEntity {
 
     /**
      * 主键ID - 自增长
@@ -23,12 +23,12 @@ public class DeptEntity {
     private Long id;
 
     /**
-     * 部门名称 - 唯一索引
+     * 角色名称 - 唯一索引
      */
     private String name;
 
     /**
-     * 部门描述
+     * 角色描述
      */
     private String description;
 
@@ -62,12 +62,12 @@ public class DeptEntity {
     // =========================
 
     /**
-     * 部门下的用户列表 - 一对多关联
+     * 拥有该角色的用户列表 - 多对多关联
      */
     private List<UserEntity> users;
 
     /**
-     * 部门用户数量 - 统计字段
+     * 角色用户数量 - 统计字段
      */
     private Integer userCount;
 }
