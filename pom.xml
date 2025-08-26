@@ -10,6 +10,7 @@
     <version>1.0.0</version>
     <modules>
         <module>springboot-base-functions</module>
+        <module>springboot-common-generate-bigdata</module>
         <module>springboot-example-jpa</module>
         <module>springboot-example-mybatis</module>
         <module>springboot-integrate-caffeine</module>
