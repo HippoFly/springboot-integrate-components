@@ -1,14 +1,17 @@
 package com.example.springintegratecaffeine.service.impl;
 
 import com.example.springintegratecaffeine.entity.UserInfo;
+import com.example.springintegratecaffeine.service.UserInfoService;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
-import com.example.springintegratecaffeine.entity.UserInfo;
-import com.example.springintegratecaffeine.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Service
@@ -19,7 +22,8 @@ public class UserInfoServiceImpl implements UserInfoService {
      */
     private HashMap<Integer, UserInfo> userInfoMap = new HashMap<>();
 
-    @Autowired
+    @Resource
+    @Qualifier("basicCache")
     Cache<String, Object> caffeineCache;
 
     @Override
@@ -33,7 +37,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public UserInfo getByName(Integer id) {
         // 先从缓存读取
-        caffeineCache.getIfPresent(id);
+        caffeineCache.getIfPresent(String.valueOf(id));
         UserInfo userInfo = (UserInfo) caffeineCache.asMap().get(String.valueOf(id));
         if (userInfo != null){
             return userInfo;
@@ -57,13 +61,13 @@ public class UserInfoServiceImpl implements UserInfoService {
         // 取旧的值
         UserInfo oldUserInfo = userInfoMap.get(userInfo.getId());
         // 替换内容
-        if (!StringUtils.isEmpty(oldUserInfo.getAge())) {
+        if (userInfo.getAge() != null && !userInfo.getAge().equals(oldUserInfo.getAge())) {
             oldUserInfo.setAge(userInfo.getAge());
         }
-        if (!StringUtils.isEmpty(oldUserInfo.getName())) {
+        if (!StringUtils.isEmpty(userInfo.getName()) && !userInfo.getName().equals(oldUserInfo.getName())) {
             oldUserInfo.setName(userInfo.getName());
         }
-        if (!StringUtils.isEmpty(oldUserInfo.getSex())) {
+        if (!StringUtils.isEmpty(userInfo.getSex()) && !userInfo.getSex().equals(oldUserInfo.getSex())) {
             oldUserInfo.setSex(userInfo.getSex());
         }
         // 将新的对象存储，更新旧对象信息
