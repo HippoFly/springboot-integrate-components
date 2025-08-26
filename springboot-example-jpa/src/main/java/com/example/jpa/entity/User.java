@@ -3,6 +3,7 @@ package com.example.jpa.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import org.hibernate.annotations.Cache;
@@ -13,11 +14,13 @@ import java.util.List;
 
 /**
  * 用户实体类，演示JPA基本注解和CRUD操作
+ * 与大数据生成模块保持一致的表结构
  */
 @Entity
-@Table(name = "user")
+@Table(name = "users")  // 统一表名为users
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Data
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -32,13 +35,19 @@ public class User {
     /**
      * 用户名，不能为空且唯一
      */
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
+    
+    /**
+     * 真实姓名
+     */
+    @Column(name = "real_name", length = 100)
+    private String realName;
     
     /**
      * 用户邮箱
      */
-    @Column
+    @Column(length = 100)
     private String email;
     
     /**
@@ -46,6 +55,18 @@ public class User {
      */
     @Column
     private Integer age;
+    
+    /**
+     * 性别
+     */
+    @Column(length = 10)
+    private String gender;
+    
+    /**
+     * 手机号码
+     */
+    @Column(length = 20)
+    private String phone;
     
     /**
      * 创建时间
@@ -58,6 +79,24 @@ public class User {
      */
     @Column(name = "update_time")
     private LocalDateTime updateTime;
+    
+    /**
+     * 创建人
+     */
+    @Column(name = "created_by", length = 50)
+    private String createdBy;
+    
+    /**
+     * 更新人
+     */
+    @Column(name = "updated_by", length = 50)
+    private String updatedBy;
+    
+    /**
+     * 版本号
+     */
+    @Version
+    private Long version;
     
     /**
      * 所属部门 - 多对一关系

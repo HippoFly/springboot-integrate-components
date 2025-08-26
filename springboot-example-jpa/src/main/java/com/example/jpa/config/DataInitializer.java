@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -181,7 +182,7 @@ public class DataInitializer implements CommandLineRunner {
             project.setDescription(projectDescriptions[random.nextInt(projectDescriptions.length)]);
             
             // 设置项目时间范围
-            project.setStartDate(LocalDateTime.now().plusDays(random.nextInt(30)));
+            project.setStartDate(LocalDate.now().plusDays(random.nextInt(30)));
             project.setEndDate(project.getStartDate().plusMonths(3 + random.nextInt(9)));
             
             project.setCreateTime(LocalDateTime.now());

@@ -2,9 +2,12 @@ server:
   port: 8280
 
 spring:
+  application:
+    name: springboot-example-jpa
+  
   datasource:
-    # 使用MySQL数据库
-    url: jdbc:mysql://localhost:3306/testdb?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+    # 使用统一的MySQL数据库
+    url: jdbc:mysql://localhost:3306/my-generated-db?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root
