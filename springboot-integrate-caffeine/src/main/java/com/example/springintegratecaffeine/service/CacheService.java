@@ -60,9 +60,10 @@ public class CacheService {
         log.info("获取用户3: {}", user3);
         
         // 4. 批量操作
-        Map<String, Object> users = new HashMap<>();
-        users.put("user:4", createSampleUser(4));
-        users.put("user:5", createSampleUser(5));
+        Map<String, Object> users = Map.of(
+            "user:4", createSampleUser(4),
+            "user:5", createSampleUser(5)
+        );
         basicCache.putAll(users);
         
         // 5. 获取所有键
