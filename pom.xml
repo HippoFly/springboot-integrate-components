@@ -16,6 +16,7 @@
         <module>springboot-integrate-caffeine</module>
         <module>springboot-integrate-kafka</module>
         <module>springboot-integrate-mongodb</module>
+        <module>springboot-integrate-websocket</module>
     </modules>
 
     <parent>

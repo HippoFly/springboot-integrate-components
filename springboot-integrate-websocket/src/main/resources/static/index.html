@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Chat Room</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f4f4f4; }
+        #username-page, #chat-page { display: none; }
+        #chat-page { max-width: 700px; margin: 30px auto; }
+        .chat-container { background: #fff; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        .chat-header { background: #0d6efd; color: white; padding: 15px; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+        .chat-messages { height: 400px; overflow-y: auto; padding: 15px; border-bottom: 1px solid #ddd; }
+        .message { list-style-type: none; margin-bottom: 15px; display: flex; align-items: flex-start; }
+        .event-message { text-align: center; color: #777; font-style: italic; display: block; }
+        .chat-message .sender { font-weight: bold; display: block; margin-bottom: 4px; }
+        .chat-message p { margin: 0; background: #eee; padding: 10px; border-radius: 10px; max-width: 80%; }
+        .message-form { padding: 15px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; text-align: center; line-height: 40px; color: white; font-weight: bold; flex-shrink: 0; }
+        .avatar img { width: 100%; height: 100%; border-radius: 50%; }
+    </style>
+</head>
+<body>
+
+<div id="username-page" class="container">
+    <div class="row vh-100 align-items-center justify-content-center">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Select a User</h3>
+                    <form id="usernameForm" name="usernameForm">
+                        <div class="mb-3">
+                            <select id="user-select" class="form-select">
+                                <option selected disabled>Choose a user...</option>
+                            </select>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Join Chat</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="chat-page" class="container">
+    <div class="chat-container">
+        <div class="chat-header">
+            <h5 class="mb-0">WebSocket Chat Room</h5>
+        </div>
+        <ul id="messageArea" class="chat-messages">
+        </ul>
+        <form id="messageForm" name="messageForm" class="message-form">
+            <div class="input-group">
+                <input type="text" id="message" placeholder="Type a message..." autocomplete="off" class="form-control"/>
+                <button class="btn btn-primary" type="submit">Send</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script>
+    'use strict';
+
+    const usernamePage = document.querySelector('#username-page');
+    const chatPage = document.querySelector('#chat-page');
+    const usernameForm = document.querySelector('#usernameForm');
+    const userSelect = document.querySelector('#user-select');
+    const messageForm = document.querySelector('#messageForm');
+    const messageInput = document.querySelector('#message');
+    const messageArea = document.querySelector('#messageArea');
+
+    let stompClient = null;
+    let userId = null;
+    let username = null;
+
+    const colors = ['#2196F3', '#32c787', '#00BCD4', '#ff5652', '#ffc107', '#ff85af', '#FF9800', '#39bbb0'];
+
+    async function loadUsers() {
+        try {
+            const response = await fetch('/api/users');
+            if (!response.ok) throw new Error('Failed to fetch users');
+            const users = await response.json();
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.username;
+                userSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error(error);
+            alert('Could not load users. Please try refreshing the page.');
+        }
+    }
+
+    function connect(event) {
+        event.preventDefault();
+        userId = userSelect.value;
+        const selectedOption = userSelect.options[userSelect.selectedIndex];
+        username = selectedOption.textContent;
+
+        if (userId && userId !== 'Choose a user...') {
+            usernamePage.style.display = 'none';
+            chatPage.style.display = 'block';
+
+            const socket = new SockJS('/gs-guide-websocket');
+            stompClient = Stomp.over(socket);
+
+            stompClient.connect({}, onConnected, onError);
+        } else {
+            alert('Please select a user to join the chat.');
+        }
+    }
+
+    function onConnected() {
+        stompClient.subscribe('/topic/public', onMessageReceived);
+        stompClient.send("/app/chat.addUser", {}, JSON.stringify({sender: userId, type: 'JOIN'}));
+    }
+
+    function onError(error) {
+        const errorMessage = document.createElement('li');
+        errorMessage.classList.add('event-message');
+        errorMessage.textContent = 'Could not connect to WebSocket server. Please refresh this page to try again!';
+        messageArea.appendChild(errorMessage);
+    }
+
+    function sendMessage(event) {
+        event.preventDefault();
+        const messageContent = messageInput.value.trim();
+        if (messageContent && stompClient) {
+            const chatMessage = {
+                content: messageInput.value,
+                type: 'CHAT'
+            };
+            stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(chatMessage));
+            messageInput.value = '';
+        }
+    }
+
+    function onMessageReceived(payload) {
+        const message = JSON.parse(payload.body);
+        const messageElement = document.createElement('li');
+        messageElement.classList.add('message');
+
+        if (message.type === 'JOIN' || message.type === 'LEAVE') {
+            messageElement.classList.add('event-message');
+            messageElement.textContent = message.content;
+        } else {
+            messageElement.classList.add('chat-message');
+
+            const avatarElement = document.createElement('div');
+            avatarElement.classList.add('avatar');
+
+            if (message.avatar) {
+                const avatarImg = document.createElement('img');
+                avatarImg.src = message.avatar;
+                avatarElement.appendChild(avatarImg);
+            } else {
+                const avatarText = document.createTextNode(message.sender[0]);
+                avatarElement.appendChild(avatarText);
+                avatarElement.style.backgroundColor = getAvatarColor(message.sender);
+            }
+            messageElement.appendChild(avatarElement);
+
+            const messageContentElement = document.createElement('div');
+
+            const usernameElement = document.createElement('span');
+            usernameElement.classList.add('sender');
+            usernameElement.textContent = message.sender;
+            messageContentElement.appendChild(usernameElement);
+
+            const textElement = document.createElement('p');
+            textElement.textContent = message.content;
+            messageContentElement.appendChild(textElement);
+
+            messageElement.appendChild(messageContentElement);
+        }
+
+        messageArea.appendChild(messageElement);
+        messageArea.scrollTop = messageArea.scrollHeight;
+    }
+
+    function getAvatarColor(messageSender) {
+        let hash = 0;
+        for (let i = 0; i < messageSender.length; i++) {
+            hash = 31 * hash + messageSender.charCodeAt(i);
+        }
+        const index = Math.abs(hash % colors.length);
+        return colors[index];
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        usernamePage.style.display = 'block';
+        loadUsers();
+    });
+
+    usernameForm.addEventListener('submit', connect, true);
+    messageForm.addEventListener('submit', sendMessage, true);
+
+</script>
+</body>
+</html>
